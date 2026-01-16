@@ -44,12 +44,13 @@ public class AdminMainFrame extends javax.swing.JFrame {
                 model.addRow(new Object[]{e.getEventId(), e.getEventName(), e.getVenue(), e.getDate()});
             }
         }
-        // 1. Load ALL agents (call in constructor)
+        
+        // 4. Agent Table
         private void loadAgentTable() {
             DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
             model.setRowCount(0);
 
-            // ✅ LOADS FROM YOUR NEW AGENTS.TXT VIA getAllAgents()
+            //  LOADS FROM YOUR NEW AGENTS.TXT VIA getAllAgents()
             List<Agent> agents = AgentController.getAllAgents();
             for (Agent a : agents) {
                 model.addRow(new Object[]{

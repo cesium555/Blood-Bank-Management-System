@@ -1,0 +1,2 @@
+1,John Doe,25,O+,Kathmandu
+2,Jane Smith,30,B+,Lalitpur

@@ -3,7 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package View;
-
+import Controller.*;
+import Model.*;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author Asal
@@ -143,6 +147,11 @@ public class UserMainFrame extends javax.swing.JFrame {
         jButton1.setFont(new java.awt.Font("Cambria Math", 0, 12)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Add");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setBackground(new java.awt.Color(51, 0, 153));
         jButton2.setFont(new java.awt.Font("Cambria Math", 0, 12)); // NOI18N
@@ -294,6 +303,37 @@ public class UserMainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+         if (DonorController.addDonor(
+                jTextField1.getText(),
+                jTextField2.getText(),
+                jTextField3.getText(),
+                jTextField4.getText(),
+                jTextField5.getText()
+            )) {
+                loadDonorTable();
+                clearFields();
+                JOptionPane.showMessageDialog(this, "Donor added!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to add donor");
+            }
+    }//GEN-LAST:event_jButton1ActionPerformed
+        private void loadDonorTable() {
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+            for (Donor d : DonorController.getAllDonors()) {
+                model.addRow(new Object[]{d.getDonorId(), d.getName(), d.getAge(), d.getBloodGroup(), d.getAddress()});
+            }
+        }
+
+        private void clearFields() {
+            jTextField1.setText("");
+            jTextField2.setText("");
+            jTextField3.setText("");
+            jTextField4.setText("");
+            jTextField5.setText("");
+        }
     /**
      * @param args the command line arguments
      */

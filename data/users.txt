@@ -1,0 +1,2 @@
+1|admin@ragat.com|admin123|Admin
+2|user@ragat.com|user123|User

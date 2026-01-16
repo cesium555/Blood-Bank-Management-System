@@ -8,6 +8,11 @@ package View;
  *
  * @author Asal
  */
+import Controller.*;
+import Model.*;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class AdminMainFrame extends javax.swing.JFrame {
     
@@ -74,7 +79,6 @@ public class AdminMainFrame extends javax.swing.JFrame {
         jTable2 = new javax.swing.JTable();
         jLabel4 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jTable3 = new javax.swing.JTable();
@@ -409,12 +413,6 @@ public class AdminMainFrame extends javax.swing.JFrame {
             }
         });
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -425,21 +423,17 @@ public class AdminMainFrame extends javax.swing.JFrame {
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 501, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jLabel4)
-                        .addGap(220, 220, 220)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(336, 336, 336)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(47, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(24, 24, 24)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton2)))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33))
@@ -611,19 +605,67 @@ public class AdminMainFrame extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+    String bloodGroup = JOptionPane.showInputDialog("Enter blood group (O+, O-, A+, etc.):");
+    String quantity = JOptionPane.showInputDialog("Enter quantity:");
+    
+    if (BloodGroupController.addBloodGroup(bloodGroup, quantity)) {
+        loadBloodGroupTable();
+        updateDashboard();
+        JOptionPane.showMessageDialog(this, "Added successfully!");
+    } else {
+        JOptionPane.showMessageDialog(this, "Failed to add");
+    }
+}
+
+    private void loadBloodGroupTable() {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+        for (BloodGroup bg : BloodGroupController.getAllBloodGroups()) {
+            model.addRow(new Object[]{bg.getBloodId(), bg.getBloodGroup(), bg.getQuantity()});
+        }
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        String name = JOptionPane.showInputDialog("Search agent by name:");
+    if (name != null && !name.isEmpty()) {
+        DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+        model.setRowCount(0);
+        for (Agent a : AgentController.searchAgentByName(name)) {
+            model.addRow(new Object[]{a.getAgentId(), a.getName(), a.getOrganization(), a.getPhone()});
+        }
+    }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+    String name = JOptionPane.showInputDialog("Event name:");
+    String venue = JOptionPane.showInputDialog("Venue:");
+    String date = JOptionPane.showInputDialog("Date (dd-MM-yyyy):");
+    
+    if (EventController.addEvent(name, venue, date)) {
+        loadEventTable();
+        JOptionPane.showMessageDialog(this, "Event added!");
+    }
+}
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    private void loadEventTable() {
+        DefaultTableModel model = (DefaultTableModel) jTable4.getModel();
+        model.setRowCount(0);
+        for (Event e : EventController.getAllEvents()) {
+            model.addRow(new Object[]{e.getEventId(), e.getEventName(), e.getVenue(), e.getDate()});
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+private void updateDashboard() {
+    jLabel11.setText(String.valueOf(BloodGroupController.getTotalBloodBags()));
+    jLabel12.setText(String.valueOf(DonorController.getTotalDonors()));
+    
+    List<Event> events = EventController.getAllEvents();
+    if (!events.isEmpty()) {
+        jLabel13.setText(events.get(events.size() - 1).getEventName());
+    }
+}
 
     /**
      * @param args the command line arguments
@@ -693,6 +735,5 @@ public class AdminMainFrame extends javax.swing.JFrame {
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable3;
     private javax.swing.JTable jTable4;
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

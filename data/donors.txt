@@ -1,1 +1,4 @@
 1|ram|19|O+|jhapa|ratka daan
+2|hatri|50|AB-|Rampur|Ghar KI Ghar
+3|Alex|35|A+|Kudint|BIr Hospital
+4|Shimran|27|O+|SHnja|Lamjung

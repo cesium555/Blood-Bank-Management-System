@@ -18,14 +18,59 @@ public class AdminMainFrame extends javax.swing.JFrame {
     
     private String loggedInUser = "admin@ragat.com"; // Passed from login
     
+        // 1. Blood Groups Table
+        private void loadBloodGroupTable() {
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+            for (BloodGroup bg : BloodGroupController.getAllBloodGroups()) {
+                model.addRow(new Object[]{bg.getBloodId(), bg.getBloodGroup(), bg.getQuantity()});
+            }
+        }
+
+        // 2. Donors Table  
+        private void loadDonorTable() {
+            DefaultTableModel model = (DefaultTableModel) jTable3.getModel();
+            model.setRowCount(0);
+            for (Donor d : DonorController.getAllDonors()) {
+                model.addRow(new Object[]{d.getDonorId(), d.getName(), d.getAge(), d.getBloodGroup(), d.getAddress()});
+            }
+        }
+
+        // 3. Events Table
+        private void loadEventTable() {
+            DefaultTableModel model = (DefaultTableModel) jTable4.getModel();
+            model.setRowCount(0);
+            for (Event e : EventController.getAllEvents()) {
+                model.addRow(new Object[]{e.getEventId(), e.getEventName(), e.getVenue(), e.getDate()});
+            }
+        }
+        // 1. Load ALL agents (call in constructor)
+        private void loadAgentTable() {
+            DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+            model.setRowCount(0);
+
+            // ✅ LOADS FROM YOUR NEW AGENTS.TXT VIA getAllAgents()
+            List<Agent> agents = AgentController.getAllAgents();
+            for (Agent a : agents) {
+                model.addRow(new Object[]{
+                    a.getAgentId(), a.getName(), 
+                    a.getOrganization(), a.getPhone()
+                });
+    }
+}
 
     // Constructor with username parameter
     public AdminMainFrame(String username) {
         this.loggedInUser = username;
         initComponents();
         updateUsername();
-        
+        loadBloodGroupTable();  
+        loadDonorTable();
+        loadEventTable(); 
+        loadAgentTable();
+        updateDashboard();
     }
+    
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AdminMainFrame.class.getName());
 
@@ -164,7 +209,7 @@ public class AdminMainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel8)
                     .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(47, Short.MAX_VALUE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -224,7 +269,7 @@ public class AdminMainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel10)
                     .addComponent(jLabel13))
-                .addContainerGap(144, Short.MAX_VALUE))
+                .addContainerGap(146, Short.MAX_VALUE))
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -476,6 +521,11 @@ public class AdminMainFrame extends javax.swing.JFrame {
 
         jComboBox1.setFont(new java.awt.Font("Cambria Math", 0, 12)); // NOI18N
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Name", "Age" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
 
         jLabel7.setFont(new java.awt.Font("Cambria Math", 0, 12)); // NOI18N
         jLabel7.setText("Sort By:");
@@ -605,7 +655,7 @@ public class AdminMainFrame extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-    String bloodGroup = JOptionPane.showInputDialog("Enter blood group (O+, O-, A+, etc.):");
+    String bloodGroup = JOptionPane.showInputDialog("Enter blood group :");
     String quantity = JOptionPane.showInputDialog("Enter quantity:");
     
     if (BloodGroupController.addBloodGroup(bloodGroup, quantity)) {
@@ -615,15 +665,6 @@ public class AdminMainFrame extends javax.swing.JFrame {
     } else {
         JOptionPane.showMessageDialog(this, "Failed to add");
     }
-}
-
-    private void loadBloodGroupTable() {
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.setRowCount(0);
-        for (BloodGroup bg : BloodGroupController.getAllBloodGroups()) {
-            model.addRow(new Object[]{bg.getBloodId(), bg.getBloodGroup(), bg.getQuantity()});
-        }
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -648,24 +689,43 @@ public class AdminMainFrame extends javax.swing.JFrame {
         loadEventTable();
         JOptionPane.showMessageDialog(this, "Event added!");
     }
-}
-
-    private void loadEventTable() {
-        DefaultTableModel model = (DefaultTableModel) jTable4.getModel();
-        model.setRowCount(0);
-        for (Event e : EventController.getAllEvents()) {
-            model.addRow(new Object[]{e.getEventId(), e.getEventName(), e.getVenue(), e.getDate()});
-        }
     }//GEN-LAST:event_jButton4ActionPerformed
-private void updateDashboard() {
-    jLabel11.setText(String.valueOf(BloodGroupController.getTotalBloodBags()));
-    jLabel12.setText(String.valueOf(DonorController.getTotalDonors()));
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+        loadDonorTableSorted();
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+    private void updateDashboard() {
+        jLabel11.setText(String.valueOf(BloodGroupController.getTotalBloodBags()));
+        jLabel12.setText(String.valueOf(DonorController.getTotalDonors()));
+
+        List<Event> events = EventController.getAllEvents();
+        if (!events.isEmpty()) {
+            jLabel13.setText(events.get(events.size() - 1).getEventName());
+        }
+    }
+    private void loadDonorTableSorted() {
+    DefaultTableModel model = (DefaultTableModel) jTable3.getModel();
+    model.setRowCount(0);
     
-    List<Event> events = EventController.getAllEvents();
-    if (!events.isEmpty()) {
-        jLabel13.setText(events.get(events.size() - 1).getEventName());
+    List<Donor> donors = DonorController.getAllDonors();
+    
+    String sortBy = jComboBox1.getSelectedItem().toString();
+    
+    if ("Name".equals(sortBy)) {
+        donors.sort((d1, d2) -> d1.getName().compareToIgnoreCase(d2.getName()));
+    } else if ("Age".equals(sortBy)) {
+        donors.sort((d1, d2) -> Integer.compare(d1.getAge(), d2.getAge()));
+    }
+    
+    for (Donor d : donors) {
+        model.addRow(new Object[]{
+            d.getDonorId(), d.getName(), d.getAge(), 
+            d.getBloodGroup(), d.getAddress()
+        });
     }
 }
+
 
     /**
      * @param args the command line arguments

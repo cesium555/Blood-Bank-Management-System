@@ -210,7 +210,7 @@ public class AdminMainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel8)
                     .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addContainerGap(47, Short.MAX_VALUE))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -270,7 +270,7 @@ public class AdminMainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel10)
                     .addComponent(jLabel13))
-                .addContainerGap(146, Short.MAX_VALUE))
+                .addContainerGap(144, Short.MAX_VALUE))
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -598,6 +598,11 @@ public class AdminMainFrame extends javax.swing.JFrame {
         });
 
         jButton5.setText("Update");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
@@ -683,12 +688,24 @@ public class AdminMainFrame extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
     String name = JOptionPane.showInputDialog("Event name:");
-    String venue = JOptionPane.showInputDialog("Venue:");
-    String date = JOptionPane.showInputDialog("Date (dd-MM-yyyy):");
+    if (name == null) return;
     
-    if (EventController.addEvent(name, venue, date)) {
+    String venue = JOptionPane.showInputDialog("Venue:");
+    if (venue == null) return;
+    
+    String date = JOptionPane.showInputDialog("Date (dd-MM-yyyy):");
+    if (date == null) return;
+    
+    // Returns error message or null
+    String error = EventController.addEvent(name, venue, date);
+    
+    if (error == null) {
+        // SUCCESS
         loadEventTable();
-        JOptionPane.showMessageDialog(this, "Event added!");
+        JOptionPane.showMessageDialog(this, "✅ Event added!");
+    } else {
+        // ERROR
+        JOptionPane.showMessageDialog(this, "❌ " + error);
     }
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -696,6 +713,31 @@ public class AdminMainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         loadDonorTableSorted();
     }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = jTable4.getSelectedRow();
+       if (selectedRow == -1) {
+           JOptionPane.showMessageDialog(this, "Select an event");
+           return;
+       }
+
+       // Get values from table (no field names needed)
+       int eventId = (int) jTable4.getValueAt(selectedRow, 0);
+       String name = jTable4.getValueAt(selectedRow, 1).toString();
+       String venue = jTable4.getValueAt(selectedRow, 2).toString();
+       String date = jTable4.getValueAt(selectedRow, 3).toString();
+
+       String error = EventController.updateEvent(eventId, name, venue, date);
+
+       if (error == null) {
+           loadEventTable();
+           updateDashboard();
+           JOptionPane.showMessageDialog(this, "✅ Updated!");
+       } else {
+           JOptionPane.showMessageDialog(this, "❌ " + error);
+       }
+    }//GEN-LAST:event_jButton5ActionPerformed
     private void updateDashboard() {
         jLabel11.setText(String.valueOf(BloodGroupController.getTotalBloodBags()));
         jLabel12.setText(String.valueOf(DonorController.getTotalDonors()));
